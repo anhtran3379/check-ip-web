@@ -1,155 +1,84 @@
 import socket
-import psutil
 import httpx
-import subprocess
-import json
 import time
 
-def get_hostname() -> str:
-    try:
-        return socket.gethostname()
-    except Exception:
-        return "Unknown"
+# Cache for client IP geo lookups to ensure blazing fast response & prevent rate limits
+_geo_cache = {}
+CACHE_TTL = 3600  # 1 hour per IP
 
-def get_primary_local_ip() -> str:
-    """Finds the primary outbound local IPv4 address."""
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        # Does not actually transmit packets, just resolves route
-        s.connect(('8.8.8.8', 80))
-        ip = s.getsockname()[0]
-    except Exception:
-        ip = '127.0.0.1'
-    finally:
-        s.close()
-    return ip
+def is_private_ip(ip: str) -> bool:
+    """Checks if an IP address is a private / local address."""
+    if not ip:
+        return True
+    if ip in ("127.0.0.1", "::1", "localhost"):
+        return True
+    if ip.startswith("10.") or ip.startswith("192.168."):
+        return True
+    if ip.startswith("172."):
+        parts = ip.split(".")
+        if len(parts) >= 2 and parts[1].isdigit():
+            val = int(parts[1])
+            if 16 <= val <= 31:
+                return True
+    if ip.startswith("fe80:") or ip.startswith("fc00:") or ip.startswith("fd00:"):
+        return True
+    return False
 
-def get_default_gateway() -> str:
-    """Attempts to retrieve the default gateway on Windows or fallback."""
-    try:
-        cmd = "Get-NetRoute -DestinationPrefix '0.0.0.0/0' | Select-Object -First 1 -ExpandProperty NextHop"
-        out = subprocess.check_output(["powershell", "-NoProfile", "-Command", cmd], text=True, timeout=2).strip()
-        if out:
-            return out
-    except Exception:
-        pass
-    return "Unavailable"
+async def lookup_ip_info(ip: str) -> dict:
+    """Queries ISP, Geolocation, and connection details for a specific client IP."""
+    now = time.time()
+    if ip in _geo_cache:
+        cached_entry = _geo_cache[ip]
+        if now - cached_entry["time"] < CACHE_TTL:
+            return cached_entry["data"]
 
-def get_network_interfaces() -> list:
-    """Extracts clean list of network interfaces with IPv4, IPv6, MAC, and status."""
-    stats = psutil.net_if_stats()
-    addrs = psutil.net_if_addrs()
-    interfaces = []
-
-    for name, addr_list in addrs.items():
-        stat = stats.get(name)
-        is_up = stat.isup if stat else False
-        speed = stat.speed if stat else 0
-
-        ipv4_list = []
-        ipv6_list = []
-        mac_address = None
-
-        for item in addr_list:
-            # Address family mapping
-            # AF_INET = 2 (IPv4)
-            # AF_INET6 = 23 on Windows (or socket.AF_INET6)
-            # AF_LINK = -1 on Windows (MAC address)
-            fam = item.family
-            if fam == socket.AF_INET:
-                ipv4_list.append({
-                    "ip": item.address,
-                    "netmask": item.netmask,
-                    "broadcast": item.broadcast
-                })
-            elif fam == getattr(socket, 'AF_INET6', 23):
-                # Clean scope id if present (e.g., fe80::...%12)
-                clean_ip = item.address.split('%')[0]
-                ipv6_list.append({
-                    "ip": clean_ip,
-                    "netmask": item.netmask
-                })
-            elif fam == psutil.AF_LINK or str(fam) == "-1":
-                mac_address = item.address
-
-        # Only list if it has at least an IP or is UP or MAC is known
-        interfaces.append({
-            "name": name,
-            "is_up": is_up,
-            "speed_mbps": speed,
-            "mac": mac_address or "N/A",
-            "ipv4": ipv4_list,
-            "ipv6": ipv6_list,
-            "is_primary": any(ip_info["ip"] == get_primary_local_ip() for ip_info in ipv4_list)
-        })
-
-    # Sort so active/primary interfaces come first
-    interfaces.sort(key=lambda x: (not x["is_primary"], not x["is_up"], x["name"]))
-    return interfaces
-
-async def get_public_ip_info() -> dict:
-    """Queries public IPv4, IPv6, and ISP/Geo information."""
+    # Fallback structure
     result = {
-        "ipv4": None,
-        "ipv6": None,
-        "isp": None,
+        "ip": ip,
+        "is_private": is_private_ip(ip),
+        "isp": "Local / Internal Network" if is_private_ip(ip) else "Unknown ISP",
         "organization": None,
-        "city": None,
+        "city": "Nội bộ (Local)",
         "region": None,
-        "country": None,
-        "country_code": None,
-        "flag_emoji": "",
+        "country": "Mạng Cục Bộ" if is_private_ip(ip) else "Unknown",
+        "country_code": "VN",
+        "flag_emoji": "🇻🇳" if is_private_ip(ip) else "🌐",
         "latitude": None,
         "longitude": None,
-        "timezone": None,
-        "error": None
+        "timezone": "Asia/Ho_Chi_Minh",
+        "postal": None,
+        "type": "IPv6" if ":" in ip else "IPv4"
     }
 
+    if is_private_ip(ip):
+        return result
+
+    # Query public provider
     async with httpx.AsyncClient(timeout=4.0) as client:
-        # Try fetching full geo & ISP info first from ipwho.is
         try:
-            r = await client.get("https://ipwho.is/")
+            r = await client.get(f"https://ipwho.is/{ip}")
             if r.status_code == 200:
                 data = r.json()
                 if data.get("success", True):
-                    fetched_ip = data.get("ip")
-                    if ":" in fetched_ip:
-                        result["ipv6"] = fetched_ip
-                    else:
-                        result["ipv4"] = fetched_ip
-                    
                     conn = data.get("connection", {})
-                    result["isp"] = conn.get("isp") or data.get("isp")
+                    result["isp"] = conn.get("isp") or data.get("isp") or "Unknown"
                     result["organization"] = conn.get("org") or data.get("org")
-                    result["city"] = data.get("city")
-                    result["region"] = data.get("region")
-                    result["country"] = data.get("country")
-                    result["country_code"] = data.get("country_code")
-                    result["flag_emoji"] = data.get("flag", {}).get("emoji", "")
+                    result["city"] = data.get("city") or "Unknown"
+                    result["region"] = data.get("region") or ""
+                    result["country"] = data.get("country") or "Unknown"
+                    result["country_code"] = data.get("country_code") or ""
+                    result["flag_emoji"] = data.get("flag", {}).get("emoji", "🌐")
                     result["latitude"] = data.get("latitude")
                     result["longitude"] = data.get("longitude")
-                    result["timezone"] = data.get("timezone", {}).get("id")
-        except Exception as e:
-            result["error"] = str(e)
+                    result["timezone"] = data.get("timezone", {}).get("id") or "UTC"
+                    result["postal"] = data.get("postal")
+        except Exception:
+            pass
 
-        # If IPv4 is missing, fetch from api4.ipify.org
-        if not result["ipv4"]:
-            try:
-                r_v4 = await client.get("https://api4.ipify.org?format=json")
-                if r_v4.status_code == 200:
-                    result["ipv4"] = r_v4.json().get("ip")
-            except Exception:
-                pass
-
-        # If IPv6 is missing, attempt to fetch from api6.ipify.org
-        if not result["ipv6"]:
-            try:
-                r_v6 = await client.get("https://api6.ipify.org?format=json")
-                if r_v6.status_code == 200:
-                    result["ipv6"] = r_v6.json().get("ip")
-            except Exception:
-                pass
-
+    _geo_cache[ip] = {
+        "time": now,
+        "data": result
+    }
     return result
 
 async def ping_latency(host: str = "8.8.8.8") -> float:
