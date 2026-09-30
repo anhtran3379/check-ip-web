@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IP Inspector - Kiểm Tra IP Máy Tính & Mạng</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- QRCode.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card:hover {
+      border-color: rgba(99, 102, 241, 0.35);
+    }
+    .pulse-dot {
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+      animation: pulsing 2s infinite;
+    }
+    @keyframes pulsing {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Background Glow Accents -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/3 -right-40 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-40 left-1/3 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- Navbar -->
+  <header class="relative z-10 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-gradient-to-tr from-indigo-600 to-cyan-500 rounded-xl shadow-lg shadow-indigo-500/20 text-white">
+          <i data-lucide="network" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+            IP Inspector
+            <span class="text-xs bg-indigo-500/20 text-indigo-300 font-semibold px-2 py-0.5 rounded-full border border-indigo-500/30">Local & Public</span>
+          </h1>
+          <p class="text-xs text-slate-400">Kiểm tra thông tin địa chỉ IP & Mạng máy tính</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Ping Badge -->
+        <button id="ping-btn" title="Click để test độ trễ (ping)" onclick="measurePing()" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/60 text-xs font-mono hover:bg-slate-700/70 transition">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span>
+          <span class="text-slate-400">Ping:</span>
+          <span id="latency-text" class="text-emerald-400 font-bold">-- ms</span>
+        </button>
+
+        <!-- QR Code for Mobile Access -->
+        <button onclick="openQrModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 text-xs font-medium text-slate-200 transition shadow-sm" title="Mở trang web trên điện thoại qua Wi-Fi">
+          <i data-lucide="smartphone" class="w-4 h-4 text-cyan-400"></i>
+          <span class="hidden sm:inline">Mở trên điện thoại</span>
+        </button>
+
+        <!-- Refresh Button -->
+        <button id="refresh-btn" onclick="fetchData(true)" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 transition active:scale-95">
+          <i id="refresh-icon" data-lucide="refresh-cw" class="w-4 h-4"></i>
+          <span>Làm mới</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="relative z-10 flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+
+    <!-- Top Notice / Client Status -->
+    <div id="client-banner" class="glass-card rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-l-4 border-l-indigo-500">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
+          <i data-lucide="laptop" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="text-xs font-medium text-slate-400 uppercase tracking-wider">Thiết bị đang truy cập</div>
+          <div class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+            IP của bạn: <span id="client-ip" class="mono text-indigo-300 font-bold">127.0.0.1</span>
+            <span id="client-scope" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">Máy chủ cục bộ</span>
+          </div>
+        </div>
+      </div>
+      <div class="text-xs text-slate-400 flex items-center gap-4">
+        <div>Tên máy: <strong id="hostname-text" class="text-slate-200 mono">--</strong></div>
+        <div>Cập nhật: <span id="last-updated" class="text-slate-300">--:--:--</span></div>
+      </div>
+    </div>
+
+    <!-- Highlighted IP Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <!-- 1. Public IPv4 -->
+      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/5 group">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+              <i data-lucide="globe" class="w-4 h-4"></i>
+              Public IPv4 (Internet)
+            </span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">Mạng bên ngoài</span>
+          </div>
+          
+          <div class="mt-2 flex items-baseline justify-between">
+            <div id="public-ipv4" class="text-2xl sm:text-3xl font-extrabold mono text-white tracking-tight break-all">
+              Đang tải...
+            </div>
+            <button onclick="copyToClipboard('public-ipv4')" title="Sao chép IP" class="p-2 ml-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-800/80 space-y-1.5 text-xs text-slate-400">
+          <div class="flex justify-between items-center">
+            <span>Nhà mạng (ISP):</span>
+            <strong id="public-isp" class="text-slate-200 font-medium truncate max-w-[180px]">--</strong>
+          </div>
+          <div class="flex justify-between items-center">
+            <span>Vị trí:</span>
+            <strong id="public-location" class="text-slate-200 font-medium">--</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Primary Local IP -->
+      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/5 group">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+              <i data-lucide="wifi" class="w-4 h-4"></i>
+              Local IPv4 (LAN / Wi-Fi)
+            </span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Mạng nội bộ</span>
+          </div>
+
+          <div class="mt-2 flex items-baseline justify-between">
+            <div id="local-ip" class="text-2xl sm:text-3xl font-extrabold mono text-white tracking-tight break-all">
+              Đang tải...
+            </div>
+            <button onclick="copyToClipboard('local-ip')" title="Sao chép IP" class="p-2 ml-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-800/80 space-y-1.5 text-xs text-slate-400">
+          <div class="flex justify-between items-center">
+            <span>Default Gateway (Router):</span>
+            <strong id="gateway-ip" class="text-slate-200 mono font-medium">--</strong>
+          </div>
+          <div class="flex justify-between items-center">
+            <span>Truy cập LAN từ thiết bị khác:</span>
+            <span id="lan-url" class="text-indigo-400 mono font-medium">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Public IPv6 -->
+      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/5 group md:col-span-2 lg:col-span-1">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+              Public IPv6
+            </span>
+            <span id="ipv6-status-badge" class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Kiểm tra</span>
+          </div>
+
+          <div class="mt-2 flex items-baseline justify-between">
+            <div id="public-ipv6" class="text-sm sm:text-base font-semibold mono text-slate-200 tracking-tight break-all">
+              Đang kiểm tra...
+            </div>
+            <button id="copy-ipv6-btn" onclick="copyToClipboard('public-ipv6')" title="Sao chép IPv6" class="p-2 ml-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-800/80 space-y-1.5 text-xs text-slate-400">
+          <div class="flex justify-between items-center">
+            <span>Trạng thái IPv6:</span>
+            <strong id="ipv6-desc" class="text-slate-200 font-medium">--</strong>
+          </div>
+          <div class="flex justify-between items-center">
+            <span>Múi giờ mạng:</span>
+            <strong id="public-tz" class="text-slate-200 font-medium">--</strong>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Network Adapters Section -->
+    <div class="glass-card rounded-2xl p-5 sm:p-6 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-4">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="server" class="w-5 h-5 text-indigo-400"></i>
+            Danh Sách Card Mạng Máy Tính (Network Adapters)
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Chi tiết tất cả giao diện mạng vật lý & ảo trên máy tính này</p>
+        </div>
+        <div class="text-xs text-slate-400 flex items-center gap-2">
+          <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Đang hoạt động (UP)</span>
+          <span class="inline-flex items-center gap-1.5 ml-2"><span class="w-2 h-2 rounded-full bg-slate-600"></span> Tắt (DOWN)</span>
+        </div>
+      </div>
+
+      <!-- Adapters Container -->
+      <div id="adapters-list" class="space-y-3">
+        <!-- Rendered dynamically -->
+        <div class="text-center py-8 text-slate-400 text-sm">Đang tải danh sách card mạng...</div>
+      </div>
+    </div>
+
+    <!-- Terminal & Developer Tools -->
+    <div class="glass-card rounded-2xl p-5 sm:p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800/80 pb-4">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="terminal" class="w-5 h-5 text-amber-400"></i>
+            Lệnh Kiểm Tra Nhanh (cURL & Command Line)
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Dùng trong Terminal / Command Prompt / PowerShell để lấy IP nhanh</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-800 flex items-center justify-between">
+          <div class="overflow-hidden mr-2">
+            <div class="text-[11px] text-slate-400 font-semibold mb-1">Lấy Public IP (Plain Text):</div>
+            <code id="curl-pub" class="text-xs text-amber-300 mono block truncate">curl -s http://localhost:8000/api/raw</code>
+          </div>
+          <button onclick="copyText('curl -s http://localhost:8000/api/raw')" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-800 flex items-center justify-between">
+          <div class="overflow-hidden mr-2">
+            <div class="text-[11px] text-slate-400 font-semibold mb-1">Lấy Local IP (LAN):</div>
+            <code id="curl-local" class="text-xs text-amber-300 mono block truncate">curl -s http://localhost:8000/api/raw?type=local</code>
+          </div>
+          <button onclick="copyText('curl -s http://localhost:8000/api/raw?type=local')" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative z-10 border-t border-slate-800/60 py-4 text-center text-xs text-slate-500">
+    IP Inspector Web App &bull; FastAPI + Tailwind CSS &bull; Local & Public IP Scanner
+  </footer>
+
+  <!-- QR Code Modal -->
+  <div id="qr-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl relative">
+      <button onclick="closeQrModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="w-12 h-12 bg-cyan-500/10 text-cyan-400 rounded-xl flex items-center justify-center mx-auto">
+        <i data-lucide="smartphone" class="w-6 h-6"></i>
+      </div>
+
+      <div>
+        <h3 class="text-base font-bold text-white">Quét mã mở trên Điện thoại</h3>
+        <p class="text-xs text-slate-400 mt-1">Đảm bảo điện thoại của bạn đang kết nối chung mạng Wi-Fi với máy tính này.</p>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl inline-block shadow-inner mx-auto" id="qrcode-box"></div>
+
+      <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex items-center justify-between">
+        <span id="qr-url-text" class="text-xs mono text-cyan-300 font-semibold truncate mr-2">http://...</span>
+        <button onclick="copyText(document.getElementById('qr-url-text').innerText)" class="p-1.5 text-slate-400 hover:text-white rounded">
+          <i data-lucide="copy" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-xl shadow-xl border border-indigo-400/30 text-xs font-semibold">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-300"></i>
+    <span id="toast-message">Đã sao chép vào bộ nhớ tạm!</span>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
