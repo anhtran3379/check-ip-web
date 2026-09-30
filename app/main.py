@@ -69,7 +69,7 @@ async def serve_index():
 @app.get("/api/info")
 async def api_info(request: Request):
     client_ip = extract_client_ip(request)
-    geo_data = await lookup_ip_info(client_ip)
+    details, security = await lookup_ip_info(client_ip)
     latency = await ping_latency()
     user_agent = request.headers.get("user-agent", "Unknown")
 
@@ -77,7 +77,9 @@ async def api_info(request: Request):
         "status": "success",
         "ip": client_ip,
         "is_private": is_private_ip(client_ip),
-        "details": geo_data,
+        "details": details,
+        "security": security,
+        "datacenter": "SGN",
         "latency_ms": latency,
         "user_agent": user_agent,
         "language": request.headers.get("accept-language", "vi,en"),
@@ -102,8 +104,8 @@ async def api_raw(request: Request):
 async def api_json(request: Request):
     """curl https://yourdomain.com/api/json"""
     client_ip = extract_client_ip(request)
-    geo_data = await lookup_ip_info(client_ip)
-    return JSONResponse(content=geo_data)
+    details, security = await lookup_ip_info(client_ip)
+    return JSONResponse(content={"ip": client_ip, "details": details, "security": security})
 
 # SEO Technical Files
 @app.get("/robots.txt", response_class=PlainTextResponse)

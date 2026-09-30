@@ -2,12 +2,17 @@ import socket
 import httpx
 import time
 
-# Cache for client IP geo lookups to ensure blazing fast response & prevent rate limits
 _geo_cache = {}
 CACHE_TTL = 3600  # 1 hour per IP
 
+KNOWN_VPN_HOSTS = [
+  "m247", "datacamp", "ovh", "digitalocean", "linode", "vultr", "choopa",
+  "hetzner", "leaseweb", "nordvpn", "expressvpn", "surfshark", "proton",
+  "fastly", "amazon", "aws", "google llc", "microsoft", "azure", "cloudflare warp",
+  "quadranet", "cogent", "zenlayer", "tzulo", "kamatera"
+]
+
 def is_private_ip(ip: str) -> bool:
-    """Checks if an IP address is a private / local address."""
     if not ip:
         return True
     if ip in ("127.0.0.1", "::1", "localhost"):
@@ -24,65 +29,85 @@ def is_private_ip(ip: str) -> bool:
         return True
     return False
 
-async def lookup_ip_info(ip: str) -> dict:
-    """Queries ISP, Geolocation, and connection details for a specific client IP."""
+def get_flag_emoji(country_code: str) -> str:
+    if not country_code or len(country_code) != 2:
+        return "🌐"
+    return "".join(chr(127397 + ord(c)) for c in country_code.upper())
+
+async def lookup_ip_info(ip: str) -> tuple[dict, dict]:
+    """Queries ISP, Geolocation, and VPN/Proxy security details."""
     now = time.time()
     if ip in _geo_cache:
         cached_entry = _geo_cache[ip]
         if now - cached_entry["time"] < CACHE_TTL:
-            return cached_entry["data"]
+            return cached_entry["details"], cached_entry["security"]
 
-    # Fallback structure
-    result = {
-        "ip": ip,
-        "is_private": is_private_ip(ip),
+    details = {
         "isp": "Local / Internal Network" if is_private_ip(ip) else "Unknown ISP",
-        "organization": None,
+        "asn": None,
         "city": "Nội bộ (Local)",
         "region": None,
-        "country": "Mạng Cục Bộ" if is_private_ip(ip) else "Unknown",
+        "country": "Mạng Cục Bộ" if is_private_ip(ip) else "Việt Nam",
         "country_code": "VN",
-        "flag_emoji": "🇻🇳" if is_private_ip(ip) else "🌐",
+        "flag_emoji": "🇻🇳",
         "latitude": None,
         "longitude": None,
         "timezone": "Asia/Ho_Chi_Minh",
         "postal": None,
-        "type": "IPv6" if ":" in ip else "IPv4"
+    }
+
+    security = {
+        "is_vpn_or_proxy": False,
+        "is_hosting": False,
+        "confidence": "Thấp",
+        "type": "Mạng Cục Bộ / Dân Dụng (Residential)"
     }
 
     if is_private_ip(ip):
-        return result
+        return details, security
 
-    # Query public provider
     async with httpx.AsyncClient(timeout=4.0) as client:
         try:
-            r = await client.get(f"https://ipwho.is/{ip}")
+            url = f"http://ip-api.com/json/{ip}?fields=status,country,countryCode,city,regionName,timezone,isp,org,as,proxy,hosting,lat,lon"
+            r = await client.get(url)
             if r.status_code == 200:
                 data = r.json()
-                if data.get("success", True):
-                    conn = data.get("connection", {})
-                    result["isp"] = conn.get("isp") or data.get("isp") or "Unknown"
-                    result["organization"] = conn.get("org") or data.get("org")
-                    result["city"] = data.get("city") or "Unknown"
-                    result["region"] = data.get("region") or ""
-                    result["country"] = data.get("country") or "Unknown"
-                    result["country_code"] = data.get("country_code") or ""
-                    result["flag_emoji"] = data.get("flag", {}).get("emoji", "🌐")
-                    result["latitude"] = data.get("latitude")
-                    result["longitude"] = data.get("longitude")
-                    result["timezone"] = data.get("timezone", {}).get("id") or "UTC"
-                    result["postal"] = data.get("postal")
+                if data.get("status") == "success":
+                    details["isp"] = data.get("isp") or details["isp"]
+                    details["asn"] = data.get("as")
+                    details["city"] = data.get("city") or details["city"]
+                    details["region"] = data.get("regionName") or ""
+                    details["country"] = data.get("country") or details["country"]
+                    details["country_code"] = data.get("countryCode") or "VN"
+                    details["flag_emoji"] = get_flag_emoji(details["country_code"])
+                    details["latitude"] = data.get("lat")
+                    details["longitude"] = data.get("lon")
+                    details["timezone"] = data.get("timezone") or "Asia/Ho_Chi_Minh"
+
+                    # Check VPN / Proxy flags
+                    is_proxy = data.get("proxy", False)
+                    is_hosting = data.get("hosting", False)
+
+                    # Also check against known VPN hosts
+                    isp_str = f"{data.get('isp', '')} {data.get('org', '')} {data.get('as', '')}".lower()
+                    matched_host = any(h in isp_str for h in KNOWN_VPN_HOSTS)
+
+                    if is_proxy or is_hosting or matched_host:
+                        security["is_vpn_or_proxy"] = True
+                        security["is_hosting"] = is_hosting or matched_host
+                        security["confidence"] = "Rất cao" if is_proxy else "Cao"
+                        security["type"] = "VPN / Proxy / Máy chủ Hosting"
         except Exception:
             pass
 
     _geo_cache[ip] = {
         "time": now,
-        "data": result
+        "details": details,
+        "security": security
     }
-    return result
+    return details, security
 
 async def ping_latency(host: str = "8.8.8.8") -> float:
-    """Measures quick TCP connect latency in milliseconds."""
     t0 = time.perf_counter()
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

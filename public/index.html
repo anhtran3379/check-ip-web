@@ -208,6 +208,36 @@
           <span id="hero-flag">🇻🇳</span>
           <span id="hero-location">Đang định vị...</span>
         </span>
+        <span id="vpn-status-badge" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
+          <i id="vpn-icon" data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span id="vpn-badge-text">Đang phân tích VPN...</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Security & VPN Diagnostic Banner -->
+    <div id="security-card" class="glass-box rounded-2xl p-5 border-l-4 border-l-emerald-500 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-start gap-3.5">
+        <div id="sec-icon-bg" class="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 flex-shrink-0 mt-0.5">
+          <i id="sec-main-icon" data-lucide="shield-check" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="text-sm font-bold text-white">Kiểm Tra Trạng Thái VPN, Proxy & Bảo Mật Kết Nối</h3>
+            <span id="sec-tag" class="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">An toàn</span>
+          </div>
+          <p id="sec-desc" class="text-xs text-slate-300 mt-1">Đang phân tích dữ liệu trạm phát mạng và chữ ký trung tâm dữ liệu...</p>
+          <div id="timezone-mismatch-alert" class="hidden text-xs text-amber-300 mt-1.5 flex items-center gap-1.5 font-medium">
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400"></i>
+            <span id="tz-alert-text">Phát hiện lệch múi giờ giữa thiết bị và địa chỉ IP!</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 self-end md:self-center">
+        <div class="text-right text-xs">
+          <span class="text-slate-400 block">Loại kết nối:</span>
+          <strong id="sec-type" class="text-white font-semibold">Residential (Dân dụng)</strong>
+        </div>
       </div>
     </div>
 
