@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary SEO Meta Tags -->
+  <title>Kiểm Tra IP Của Tôi - Xem Địa Chỉ IP, ISP & Vị Trí Chính Xác Miễn Phí</title>
+  <meta name="title" content="Kiểm Tra IP Của Tôi - Xem Địa Chỉ IP, ISP & Vị Trí Chính Xác Miễn Phí">
+  <meta name="description" content="Kiểm tra địa chỉ IP hiện tại của bạn nhanh chóng, chính xác 100%. Xem thông tin nhà mạng (ISP), vị trí địa lý (Thành phố, Quốc gia), phân tích IPv4, IPv6, trình duyệt và độ trễ mạng hoàn toàn miễn phí.">
+  <meta name="keywords" content="kiểm tra ip, check ip, ip của tôi, what is my ip, địa chỉ ip của tôi là gì, xem ip, kiểm tra vị trí ip, check ip online, my ip address, tra cứu ip, ip info">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="Vietnamese">
+  <meta name="author" content="CheckIP Online">
+  <link rel="canonical" href="https://checkip.vn/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://checkip.vn/">
+  <meta property="og:title" content="Kiểm Tra IP Của Tôi - Xem Địa Chỉ IP & Nhà Mạng Nhanh Nhất">
+  <meta property="og:description" content="Xem ngay địa chỉ IP công cộng (Public IP) của bạn, vị trí địa lý, nhà mạng cung cấp dịch vụ Internet (ISP) và kiểm tra bảo mật kết nối.">
+  <meta property="og:site_name" content="CheckIP.vn">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="Kiểm Tra IP Của Tôi - Xem Địa Chỉ IP & Vị Trí Chính Xác">
+  <meta property="twitter:description" content="Công cụ tra cứu IP miễn phí, không lưu log, nhận diện ngay lập tức nhà mạng, thành phố và trạng thái kết nối mạng của bạn.">
+
+  <!-- Favicon SVG -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+
+  <!-- Schema.org JSON-LD Structured Data for Google Rich Snippets -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://checkip.vn/#webapp",
+        "name": "Kiểm Tra IP Của Tôi - Check IP Online",
+        "url": "https://checkip.vn/",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "All",
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "description": "Công cụ trực tuyến miễn phí giúp người dùng tra cứu địa chỉ IP công cộng, nhà mạng, quốc gia, thành phố và trạng thái kết nối.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "VND"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://checkip.vn/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Địa chỉ IP là gì?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Địa chỉ IP (Internet Protocol) là một dãy số định danh duy nhất được gán cho mỗi thiết bị khi kết nối vào mạng Internet. Nó hoạt động như một địa chỉ nhà ảo, cho phép các máy tính, điện thoại gửi và nhận dữ liệu qua lại với nhau."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Sự khác biệt giữa IP Public và IP Private là gì?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "IP Public (IP công cộng) là địa chỉ được nhà mạng (ISP) cấp cho modem/router của bạn để giao tiếp với toàn thế giới trên Internet. IP Private (IP nội bộ, ví dụ 192.168.1.x) là địa chỉ do router cấp riêng cho từng thiết bị trong mạng Wi-Fi của bạn và không thể truy cập trực tiếp từ Internet."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "IPv4 và IPv6 khác nhau như thế nào?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "IPv4 sử dụng định dạng 32-bit gồm 4 cụm số (ví dụ: 192.0.2.1), cung cấp khoảng 4,3 tỷ địa chỉ. IPv6 sử dụng định dạng 128-bit gồm 8 nhóm ký tự hexa (ví dụ: 2001:0db8:85a3::8a2e:0370:7334), cung cấp không gian địa chỉ gần như vô hạn và hỗ trợ định tuyến, bảo mật tốt hơn."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Làm thế nào để ẩn hoặc thay đổi địa chỉ IP của tôi?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bạn có thể ẩn địa chỉ IP thật của mình bằng cách sử dụng mạng riêng ảo (VPN), máy chủ Proxy, hoặc mạng trình duyệt Tor. Khi sử dụng VPN, lưu lượng truy cập của bạn sẽ được mã hóa và đi qua máy chủ trung gian, giúp che giấu IP và vị trí địa lý thực tế."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Người khác có thể tìm ra chính xác địa chỉ nhà của tôi qua IP không?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Không. Địa chỉ IP chỉ cung cấp vị trí địa lý tương đối cấp thành phố hoặc quận/huyện dựa trên trạm phát của nhà mạng (ISP). Chỉ có cơ quan chức năng có lệnh pháp lý mới có thể yêu cầu nhà mạng tra cứu hợp đồng đăng ký để biết địa chỉ lắp đặt chính xác."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .glass-box {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .pulse-dot {
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+      animation: pulsing 2s infinite;
+    }
+    @keyframes pulsing {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Background Ambient Glow -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px]"></div>
+    <div class="absolute top-1/3 -right-32 w-96 h-96 bg-cyan-600/15 rounded-full blur-[120px]"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="relative z-10 border-b border-slate-800/80 bg-slate-900/70 backdrop-blur-md sticky top-0">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+      <a href="/" class="flex items-center space-x-3 group">
+        <div class="p-2 bg-gradient-to-tr from-indigo-600 to-cyan-500 rounded-xl shadow-lg shadow-indigo-500/25 text-white group-hover:scale-105 transition">
+          <i data-lucide="globe" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="text-lg font-black text-white tracking-tight flex items-center gap-1.5">
+            CheckIP<span class="text-indigo-400">.vn</span>
+          </span>
+          <span class="text-[11px] text-slate-400 block -mt-1 font-medium">Kiểm tra địa chỉ IP miễn phí</span>
+        </div>
+      </a>
+
+      <!-- Quick Actions -->
+      <div class="flex items-center space-x-3">
+        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-xs font-mono">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span>
+          <span id="header-edge" class="text-emerald-400 font-semibold">Edge: SGN</span>
+        </div>
+        <button onclick="fetchData()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-md shadow-indigo-600/30 transition active:scale-95">
+          <i id="refresh-icon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          <span>Làm mới</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Main Section -->
+  <main class="relative z-10 flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 space-y-10">
+
+    <!-- Hero Card: YOUR IP IS -->
+    <div class="glass-box rounded-3xl p-6 sm:p-10 text-center relative overflow-hidden shadow-2xl border-indigo-500/20">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold mb-4">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+        <span>Địa chỉ IP công cộng (Public IP) của bạn</span>
+      </div>
+
+      <!-- IP Display -->
+      <div class="flex items-center justify-center gap-3 my-2">
+        <h1 id="client-ip-hero" class="text-3xl sm:text-5xl md:text-6xl font-black mono text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-200 tracking-tight break-all">
+          Đang xác định...
+        </h1>
+        <button onclick="copyHeroIP()" title="Sao chép IP" class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/80 transition active:scale-90 flex-shrink-0">
+          <i data-lucide="copy" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- IP Meta Badges -->
+      <div class="flex flex-wrap items-center justify-center gap-3 mt-4 text-xs font-medium">
+        <span id="ip-type-badge" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">IPv4</span>
+        <span id="ip-isp-badge" class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5">
+          <i data-lucide="wifi" class="w-3.5 h-3.5"></i>
+          <span id="hero-isp">Đang tải ISP...</span>
+        </span>
+        <span id="ip-location-badge" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1.5">
+          <span id="hero-flag">🇻🇳</span>
+          <span id="hero-location">Đang định vị...</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <!-- 1. ISP Card -->
+      <div class="glass-box rounded-2xl p-5 space-y-2">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-semibold">
+          <span>Nhà mạng (ISP)</span>
+          <i data-lucide="radio" class="w-4 h-4 text-indigo-400"></i>
+        </div>
+        <div id="detail-isp" class="text-base font-bold text-white truncate">--</div>
+        <div id="detail-asn" class="text-xs text-slate-400 mono">--</div>
+      </div>
+
+      <!-- 2. Location Card -->
+      <div class="glass-box rounded-2xl p-5 space-y-2">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-semibold">
+          <span>Vị trí địa lý</span>
+          <i data-lucide="map-pin" class="w-4 h-4 text-rose-400"></i>
+        </div>
+        <div id="detail-city" class="text-base font-bold text-white">--</div>
+        <div id="detail-country" class="text-xs text-slate-400">--</div>
+      </div>
+
+      <!-- 3. Coordinates & Timezone -->
+      <div class="glass-box rounded-2xl p-5 space-y-2">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-semibold">
+          <span>Múi giờ & Tọa độ</span>
+          <i data-lucide="clock" class="w-4 h-4 text-cyan-400"></i>
+        </div>
+        <div id="detail-tz" class="text-base font-bold text-white">--</div>
+        <div id="detail-coords" class="text-xs text-slate-400 mono">--</div>
+      </div>
+
+      <!-- 4. Device & Browser -->
+      <div class="glass-box rounded-2xl p-5 space-y-2">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-semibold">
+          <span>Trình duyệt & Màn hình</span>
+          <i data-lucide="monitor" class="w-4 h-4 text-emerald-400"></i>
+        </div>
+        <div id="detail-browser" class="text-base font-bold text-white">--</div>
+        <div id="detail-screen" class="text-xs text-slate-400">--</div>
+      </div>
+
+    </div>
+
+    <!-- Developer & Terminal Tool -->
+    <div class="glass-box rounded-2xl p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-sm font-bold text-white flex items-center gap-2">
+            <i data-lucide="terminal" class="w-4 h-4 text-amber-400"></i>
+            API & Lệnh Terminal (Dành Cho Lập Trình Viên)
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Lấy nhanh IP của bạn từ Command Prompt, PowerShell hoặc Linux Terminal</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+          <div class="overflow-hidden mr-2">
+            <span class="text-[11px] text-slate-400 block mb-0.5">Lấy IP dạng Plain Text:</span>
+            <code id="curl-plain" class="mono text-amber-300 font-bold block truncate">curl -s https://checkip.vn/ip</code>
+          </div>
+          <button onclick="copyText('curl -s ' + window.location.origin + '/ip')" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+          <div class="overflow-hidden mr-2">
+            <span class="text-[11px] text-slate-400 block mb-0.5">Lấy chi tiết dạng JSON:</span>
+            <code id="curl-json" class="mono text-amber-300 font-bold block truncate">curl -s https://checkip.vn/api/json</code>
+          </div>
+          <button onclick="copyText('curl -s ' + window.location.origin + '/api/json')" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO ARTICLE SECTION (Crucial for Google Ranking) -->
+    <article class="glass-box rounded-3xl p-6 sm:p-10 space-y-8 text-slate-300 leading-relaxed text-sm">
+      <header class="border-b border-slate-800 pb-5">
+        <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">
+          Hướng Dẫn Chi Tiết Về Địa Chỉ IP & Bảo Mật Mạng
+        </h2>
+        <p class="text-xs text-slate-400 mt-1">Tìm hiểu mọi điều bạn cần biết về địa chỉ IP, cách hoạt động và cách bảo vệ quyền riêng tư.</p>
+      </header>
+
+      <section class="space-y-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+          1. Địa chỉ IP là gì và tại sao nó lại quan trọng?
+        </h3>
+        <p>
+          <strong>Địa chỉ IP (Internet Protocol Address)</strong> là một chuỗi định danh kỹ thuật số duy nhất được cấp cho từng thiết bị kết nối vào Internet (như máy tính, điện thoại, máy chủ, camera). Nó hoạt động tương tự như số điện thoại hoặc địa chỉ nhà ngoài đời thực: nếu không có địa chỉ IP, các trang web không thể biết gửi dữ liệu hình ảnh, video hay văn bản về cho thiết bị nào của bạn.
+        </p>
+      </section>
+
+      <section class="space-y-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+          2. Phân biệt IP Public và IP Private
+        </h3>
+        <p>
+          Trong mạng máy tính, có hai loại địa chỉ IP căn bản bạn cần phân biệt:
+        </p>
+        <ul class="list-disc list-inside space-y-1.5 ml-2 text-slate-300">
+          <li><strong>IP Public (IP công cộng):</strong> Là địa chỉ do nhà cung cấp dịch vụ mạng (ISP) như Viettel, VNPT, FPT cấp cho modem của bạn. Đây chính là địa chỉ mà trang web này đang hiển thị ở trên, và là địa chỉ các máy chủ trên toàn thế giới nhìn thấy khi bạn truy cập Internet.</li>
+          <li><strong>IP Private (IP nội bộ):</strong> Là địa chỉ do router cấp riêng cho từng thiết bị trong gia đình hoặc văn phòng của bạn (thường bắt đầu bằng <code>192.168.x.x</code> hoặc <code>10.x.x.x</code>). Các địa chỉ này chỉ có ý nghĩa trong mạng LAN nội bộ và hoàn toàn vô hình từ Internet.</li>
+        </ul>
+      </section>
+
+      <section class="space-y-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+          3. So sánh IPv4 và IPv6
+        </h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse border border-slate-800 text-xs">
+            <thead>
+              <tr class="bg-slate-900/80 text-white">
+                <th class="p-3 border border-slate-800">Tiêu chí</th>
+                <th class="p-3 border border-slate-800">IPv4</th>
+                <th class="p-3 border border-slate-800">IPv6</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="p-3 border border-slate-800 font-semibold text-slate-200">Độ dài</td>
+                <td class="p-3 border border-slate-800">32-bit (4 byte)</td>
+                <td class="p-3 border border-slate-800">128-bit (16 byte)</td>
+              </tr>
+              <tr>
+                <td class="p-3 border border-slate-800 font-semibold text-slate-200">Số lượng địa chỉ</td>
+                <td class="p-3 border border-slate-800">Khoảng 4,3 tỷ (đã cạn kiệt)</td>
+                <td class="p-3 border border-slate-800">Gần như vô tận (~3.4×10³⁸)</td>
+              </tr>
+              <tr>
+                <td class="p-3 border border-slate-800 font-semibold text-slate-200">Định dạng mẫu</td>
+                <td class="p-3 border border-slate-800 mono">42.115.242.14</td>
+                <td class="p-3 border border-slate-800 mono">2405:4802:90d3::1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- FAQ Section matching Schema JSON-LD -->
+      <section class="space-y-4 pt-4 border-t border-slate-800">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i data-lucide="help-circle" class="w-5 h-5 text-indigo-400"></i>
+          Câu Hỏi Thường Gặp (FAQ)
+        </h3>
+
+        <div class="space-y-3">
+          <details class="bg-slate-900/80 rounded-xl p-4 border border-slate-800 cursor-pointer">
+            <summary class="font-semibold text-white select-none">Làm thế nào để ẩn hoặc đổi địa chỉ IP của tôi?</summary>
+            <p class="mt-2 text-xs text-slate-400">
+              Bạn có thể sử dụng mạng riêng ảo (VPN), máy chủ Proxy hoặc trình duyệt Tor. VPN sẽ mã hóa toàn bộ dữ liệu duyệt web và định tuyến qua máy chủ ở quốc gia khác, giúp che giấu IP thực sự của bạn khỏi các trang web và nhà mạng.
+            </p>
+          </details>
+
+          <details class="bg-slate-900/80 rounded-xl p-4 border border-slate-800 cursor-pointer">
+            <summary class="font-semibold text-white select-none">Người khác có thể biết chính xác số nhà của tôi qua IP không?</summary>
+            <p class="mt-2 text-xs text-slate-400">
+              Hoàn toàn không. Dữ liệu định vị qua IP chỉ mang tính tương đối (cấp thành phố hoặc khu vực trạm phát của ISP). Chỉ có nhà mạng và cơ quan hành pháp có thẩm quyền mới có thể liên kết địa chỉ IP với hợp đồng cung cấp dịch vụ Internet của gia đình bạn.
+            </p>
+          </details>
+
+          <details class="bg-slate-900/80 rounded-xl p-4 border border-slate-800 cursor-pointer">
+            <summary class="font-semibold text-white select-none">Trang web này có lưu lại thông tin IP của tôi không?</summary>
+            <p class="mt-2 text-xs text-slate-400">
+              Không. <strong>CheckIP.vn</strong> cam kết tôn trọng quyền riêng tư tối đa. Chúng tôi không lưu trữ nhật ký (log) truy cập hay bất kỳ dữ liệu cá nhân nào của người dùng.
+            </p>
+          </details>
+        </div>
+      </section>
+    </article>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative z-10 border-t border-slate-800/80 py-6 text-center text-xs text-slate-500 bg-slate-950">
+    <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <span>© 2026 CheckIP.vn &bull; Công cụ kiểm tra IP miễn phí hàng đầu Việt Nam</span>
+      <div class="flex items-center space-x-4">
+        <a href="/robots.txt" class="hover:text-slate-300">Robots.txt</a>
+        <a href="/sitemap.xml" class="hover:text-slate-300">Sitemap</a>
+        <a href="/ip" class="hover:text-slate-300">Plain IP API</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-xl shadow-xl border border-indigo-400/30 text-xs font-semibold">
+    <i data-lucide="check" class="w-4 h-4 text-emerald-300"></i>
+    <span id="toast-message">Đã sao chép vào bộ nhớ tạm!</span>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

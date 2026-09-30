@@ -24,11 +24,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "public")
 if not os.path.exists(STATIC_DIR):
     os.makedirs(STATIC_DIR, exist_ok=True)
 
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+from fastapi.responses import FileResponse
+
+@app.get("/app.js")
+async def serve_app_js():
+    return FileResponse(os.path.join(STATIC_DIR, "app.js"))
 
 def extract_client_ip(request: Request) -> str:
     """Extracts client IP checking Cloudflare, reverse proxies, and fallback."""

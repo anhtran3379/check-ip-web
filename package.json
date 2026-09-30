@@ -1,0 +1,12 @@
+{
+  "name": "check-ip-pages",
+  "version": "1.0.0",
+  "description": "SEO-optimized Client IP Checker on Cloudflare Pages",
+  "scripts": {
+    "dev": "npx wrangler pages dev public",
+    "deploy": "npx wrangler pages deploy public"
+  },
+  "devDependencies": {
+    "wrangler": "^3.100.0"
+  }
+}
