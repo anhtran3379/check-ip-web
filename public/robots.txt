@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://checkip.vn/sitemap.xml
+Sitemap: https://check-ip-web.pages.dev/sitemap.xml

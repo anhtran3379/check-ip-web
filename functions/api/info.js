@@ -10,7 +10,7 @@ function getFlagEmoji(countryCode) {
 const KNOWN_VPN_HOSTS = [
   "m247", "datacamp", "ovh", "digitalocean", "linode", "vultr", "choopa",
   "hetzner", "leaseweb", "nordvpn", "expressvpn", "surfshark", "proton",
-  "fastly", "amazon", "aws", "google llc", "microsoft", "azure", "cloudflare warp",
+  "fastly", "amazon", "aws", "google llc", "microsoft", "azure", "cloudflare",
   "quadranet", "cogent", "zenlayer", "tzulo", "kamatera"
 ];
 
