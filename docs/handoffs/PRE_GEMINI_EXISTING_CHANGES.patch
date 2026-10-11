@@ -1,0 +1,89 @@
+diff --git a/README.md b/README.md
+index 297f28c..4b7cab3 100644
+--- a/README.md
++++ b/README.md
+@@ -34,21 +34,27 @@ http://localhost:8000
+ 
+ ### Cách 2: Chạy bằng dòng lệnh (Terminal / PowerShell)
+ 
+-1. Kích hoạt môi trường ảo:
++1. Tạo môi trường ảo tại thư mục dự án (chỉ cần làm lần đầu):
++   ```powershell
++   python -m venv .venv
++   ```
++2. Kích hoạt môi trường ảo:
+    ```powershell
+    .\.venv\Scripts\activate
+    ```
+-2. Cài đặt thư viện (nếu chưa cài):
++3. Cài đặt thư viện (nếu chưa cài):
+    ```powershell
+-   pip install -r requirements.txt
++   python -m pip install -r requirements.txt
+    ```
+-3. Khởi động server:
++4. Khởi động server:
+    ```powershell
+    python run.py
+    ```
+ 
+ Ứng dụng sẽ tự động mở tại `http://localhost:8000`.
+ 
++Khi chuyển dự án sang thư mục hoặc ổ đĩa khác, hãy tạo lại `.venv` tại vị trí mới rồi cài lại thư viện. Không sao chép môi trường ảo cũ vì các lệnh bên trong có thể giữ đường dẫn tuyệt đối tới vị trí trước đó.
++
+ ---
+ 
+ ## 📱 Truy Cập Từ Thiết Bị Khác Trong Mạng LAN
+diff --git a/run.py b/run.py
+index 9d1454a..f7529f8 100644
+--- a/run.py
++++ b/run.py
+@@ -2,7 +2,17 @@ import uvicorn
+ import webbrowser
+ import threading
+ import time
+-from app.network import get_primary_local_ip
++import socket
++
++
++def get_primary_local_ip():
++    """Find the outgoing LAN address without sending network traffic."""
++    try:
++        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
++            sock.connect(("8.8.8.8", 80))
++            return sock.getsockname()[0]
++    except OSError:
++        return "127.0.0.1"
+ 
+ def open_browser():
+     time.sleep(1.2)
+diff --git a/start.bat b/start.bat
+index e714ca4..2989ef8 100644
+--- a/start.bat
++++ b/start.bat
+@@ -1,4 +1,5 @@
+ @echo off
++chcp 65001 >nul
+ title IP Inspector - Kiem tra IP May Tinh
+ echo ===================================================
+ echo   Khoi dong IP Inspector Web Application...
+@@ -9,10 +10,19 @@ cd /d "%~dp0"
+ IF NOT EXIST ".venv\Scripts\python.exe" (
+     echo [!] Khong tim thay moi truong ao (.venv). Dang tao moi...
+     python -m venv .venv
++    if errorlevel 1 goto :failed
+     echo [*] Dang cai dat thu vien...
+     .\.venv\Scripts\python.exe -m pip install -r requirements.txt
++    if errorlevel 1 goto :failed
+ )
+ 
+ echo [*] Dang chay ung dung tren cong 8000...
+ .\.venv\Scripts\python.exe run.py
++if errorlevel 1 goto :failed
+ pause
++exit /b 0
++
++:failed
++echo [!] Khoi dong that bai. Kiem tra thong bao loi ben tren.
++pause
++exit /b 1

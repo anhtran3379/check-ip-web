@@ -1,11 +1,22 @@
+import { extractPagesClientIP } from "../lib/ip.js";
+
 export async function onRequest(context) {
   const { request } = context;
-  let clientIP = request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for") || "127.0.0.1";
-  if (clientIP.includes(",")) {
-    clientIP = clientIP.split(",")[0].trim();
+  const extracted = extractPagesClientIP(request);
+
+  if (!extracted.ok) {
+    return new Response("unavailable\n", {
+      status: extracted.status_code,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-store, max-age=0"
+      }
+    });
   }
 
-  return new Response(clientIP + "\n", {
+  return new Response(extracted.classification.ip + "\n", {
+    status: 200,
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Access-Control-Allow-Origin": "*",

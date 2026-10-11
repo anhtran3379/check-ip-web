@@ -2,7 +2,17 @@ import uvicorn
 import webbrowser
 import threading
 import time
-from app.network import get_primary_local_ip
+import socket
+
+
+def get_primary_local_ip():
+    """Find the outgoing LAN address without sending network traffic."""
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.connect(("8.8.8.8", 80))
+            return sock.getsockname()[0]
+    except OSError:
+        return "127.0.0.1"
 
 def open_browser():
     time.sleep(1.2)
@@ -20,4 +30,4 @@ if __name__ == "__main__":
     threading.Thread(target=open_browser, daemon=True).start()
 
     # Start FastAPI server listening on all network interfaces
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=False)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=False, proxy_headers=False)

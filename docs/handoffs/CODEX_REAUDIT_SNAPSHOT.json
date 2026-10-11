@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-12",
+  "workspace": "C:\\Dev\\check-ip-local",
+  "head": "f98382ba5c66e0c31b527528cb66c6410c0aa1bb",
+  "branch": "main",
+  "outcome": "changes-required",
+  "closed_findings": [
+    "F1",
+    "F3",
+    "F4"
+  ],
+  "remaining_findings": [
+    "R2-F2"
+  ],
+  "files": {
+    "README.md": "614bc991bdb473cc0c265f02f1edfbe40419a8e928f36f8e24b5f1991f954087",
+    "app/main.py": "bdb82e3e0444fcc4794ca5ebb71d2aff25ac91795d7168314977dbb970682a80",
+    "app/network.py": "5644b0d08d3edc5ed016b286c911ea8554675b4d07afbd68dede011c280f9b70",
+    "functions/api/info.js": "6683d9379a49fcf8e6217b32110557e0abea237f24dec0f4851338aef8c016f0",
+    "functions/ip.js": "88d10adf7e25bb04aef82da0812583dde3ea9a74115a7e5f6009da0357e80de9",
+    "functions/api/json.js": "286af648f1626a942d4c98b85af17dc44127a9a1e6a388a07143caf52009efaa",
+    "lib/ip.js": "21ef20fe9077f280f98a05eb4f21d56b6b5915e310a3b5fc77aeeaf2b66a931d",
+    "package.json": "1f0cc3deb597fc4dc7e52b60b09e037f9d7416867e5148803ffc09d00777c91d",
+    "public/app.js": "ec0b26a21ae890fb390741f9c9651daa48f21b4a4bd5c389c7d77e12b4a24ed6",
+    "public/index.html": "319465e6c5167c53dd74e9759d8e26e4ea07dc4294f18782614fd14831ec2366",
+    "public/robots.txt": "417180fcb3c1a67ccc42eefae2a5e3d03f3b3dfaa3a51e57a8c4bb50b739f7eb",
+    "public/sitemap.xml": "873128fee8e470a182479ff957aa9d4efccd4d064c5d02a727b2b90a261406db",
+    "run.py": "e8e394407739e0246760a98d6ff10f4378bbec8b8aa224277a85bf3f65baca3d",
+    "start.bat": "0f6e6b1f2790550ff5937d272e65c64a6e5790ce431aae57f7b9efae0531031e",
+    "tests/fixtures.json": "bb44c72a32127cc0be6b0ac6d01bcb55d8ce42c517d48f11e0654d028de380f5",
+    "tests/test_check_ip.py": "9667bf42878bff73270bcb66b7943b6cde3ec5a9dfd0f4a2c6703c5b9a4acbdc",
+    "tests/check_ip.test.js": "f45e3dc67e40b4af8df5e6cd510d6393a2b709ca3ce0a2aae0a99642e0d36db8",
+    "docs/handoffs/GEMINI_FIX_REPORT.md": "f509ef31a246be944daf9613b2defd2a9c5cb5c890b0d050eb86fa5aede7298f",
+    "docs/handoffs/GEMINI_FIX_PLAN.md": "65d6d0abdae85413796802b11223172769e6e00181871ccb717a5eeed07fb7f1",
+    "docs/handoffs/GEMINI_FIX_BASELINE.json": "057639a646c1f21b32d5f484114ed2b714625015273a36cfa7c4c265e651906d"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-11",
+  "workspace": "C:\\Dev\\check-ip-local",
+  "head": "f98382ba5c66e0c31b527528cb66c6410c0aa1bb",
+  "outcome": "changes-required",
+  "files": {
+    "README.md": "614bc991bdb473cc0c265f02f1edfbe40419a8e928f36f8e24b5f1991f954087",
+    "app/main.py": "bdb82e3e0444fcc4794ca5ebb71d2aff25ac91795d7168314977dbb970682a80",
+    "app/network.py": "23f8d5f7bf2d6bf73a6cd6aea8d2cdbf8429b78cf65274e5013f3341e7d2bc5e",
+    "functions/api/info.js": "bd2dcc6cc4af23f7944eed7381b21b8d165e62549ff800da394186a9aac3f35a",
+    "functions/ip.js": "88d10adf7e25bb04aef82da0812583dde3ea9a74115a7e5f6009da0357e80de9",
+    "functions/api/json.js": "286af648f1626a942d4c98b85af17dc44127a9a1e6a388a07143caf52009efaa",
+    "lib/ip.js": "79750c70114f0f86828e249cfcb2878469718284c3683ad52c87940d1150052f",
+    "package.json": "1f0cc3deb597fc4dc7e52b60b09e037f9d7416867e5148803ffc09d00777c91d",
+    "public/app.js": "ec0b26a21ae890fb390741f9c9651daa48f21b4a4bd5c389c7d77e12b4a24ed6",
+    "public/index.html": "319465e6c5167c53dd74e9759d8e26e4ea07dc4294f18782614fd14831ec2366",
+    "public/robots.txt": "417180fcb3c1a67ccc42eefae2a5e3d03f3b3dfaa3a51e57a8c4bb50b739f7eb",
+    "public/sitemap.xml": "873128fee8e470a182479ff957aa9d4efccd4d064c5d02a727b2b90a261406db",
+    "run.py": "e8e394407739e0246760a98d6ff10f4378bbec8b8aa224277a85bf3f65baca3d",
+    "start.bat": "0f6e6b1f2790550ff5937d272e65c64a6e5790ce431aae57f7b9efae0531031e",
+    "tests/fixtures.json": "2aac215e12a49645b62a6c786598e124255dd73a10d207e6247ee89fb7240b9b",
+    "tests/test_check_ip.py": "d561ed57a295ccf8a6d0e399ec9af6374e6c68b9dc5fc43e75fde8f3a6855b4b",
+    "tests/check_ip.test.js": "f28d5a5e27ab627546792940849f693d58d0084aae0cb6129bfa0141cece916a",
+    "docs/handoffs/GEMINI_FIX_REPORT.md": "90d6f7d21251453ce772bc38e83c020b0a52985c4ed3a2f61256a50db28c0d84",
+    "docs/handoffs/GEMINI_FIX_PLAN.md": "65d6d0abdae85413796802b11223172769e6e00181871ccb717a5eeed07fb7f1",
+    "docs/handoffs/GEMINI_FIX_BASELINE.json": "057639a646c1f21b32d5f484114ed2b714625015273a36cfa7c4c265e651906d"
+  }
+}

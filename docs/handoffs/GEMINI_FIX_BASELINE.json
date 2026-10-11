@@ -1,0 +1,34 @@
+{
+  "captured_date": "2026-10-11",
+  "timezone": "Asia/Saigon",
+  "workspace": "C:\\Dev\\check-ip-local",
+  "branch": "main",
+  "head": "f98382ba5c66e0c31b527528cb66c6410c0aa1bb",
+  "tracked_status_before_handoff": [
+    " M README.md",
+    " M run.py",
+    " M start.bat"
+  ],
+  "existing_change_owner": "Codex: migrate Python environment to C, repair local launcher, update startup instructions",
+  "files": {
+    ".gitignore": "95e82d2a49e167a1619dbbea978a1baf6a73e983d272113d683077b0bf8e9a2d",
+    "Dockerfile": "aaadbf83d83013a6d55fd69dc942258ec249f37141f192856dffe67c798c0675",
+    "Procfile": "c34e990d19f5437966b31e53916b9e7ed9faad4b3e5cac7c7eb9c9335b841a6f",
+    "README.md": "3d34774b7b530c93fb330c1984abac5c0970324f3be002b59365c98408081994",
+    "app/main.py": "a375ea087abe7e6e3a9a4dd4bc90e21dd4ca5a490403109f1575863acb417151",
+    "app/network.py": "8fdcd80f7c58407d228ccf560f8b9dc9b6283e19e66ad8e1e04c3b6d83bfcf37",
+    "app/static/app.js": "bad3a10adf1d1dc3842eac19f397c3ef1106a4100a3a747a943650ddf7f9779e",
+    "app/static/index.html": "3a114cadaa383d515adc55206c57251f4fa5e58840da29727654baba537d5545",
+    "functions/api/info.js": "5d3ac63838532083390139a948ee1abe053b145c0d37543ead8ec89c773aa6d6",
+    "functions/api/json.js": "286af648f1626a942d4c98b85af17dc44127a9a1e6a388a07143caf52009efaa",
+    "functions/ip.js": "68883e48672aff18be7f515c6170c14c1ed255e070197c4fc664bd30ccd173c6",
+    "package.json": "01e5571d3823bbe9c8aa07bc734995b3c02ddd524e175fd392199bc9982dc9b6",
+    "public/app.js": "702eed0bf8b1523adc3ef3a5735836e021a1fa149c4ed7a678302e2ee6330b21",
+    "public/index.html": "c6dfa5d0050ee20e33a2c4d2586e42b5a42cbb045de07de2559078daf95b7f8c",
+    "public/robots.txt": "417180fcb3c1a67ccc42eefae2a5e3d03f3b3dfaa3a51e57a8c4bb50b739f7eb",
+    "public/sitemap.xml": "873128fee8e470a182479ff957aa9d4efccd4d064c5d02a727b2b90a261406db",
+    "requirements.txt": "63dd9e8c0d15d8201cfbb432db03ba000d67dd3aa5a9f49729ffd6d23c6d67e4",
+    "run.py": "6a9eb00c1f7c210d75e41510ebc42571fd464e1127b0f8031fd632f8b0d1ff5c",
+    "start.bat": "0f6e6b1f2790550ff5937d272e65c64a6e5790ce431aae57f7b9efae0531031e"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-12",
+  "workspace": "C:\\Dev\\check-ip-local",
+  "head": "f98382ba5c66e0c31b527528cb66c6410c0aa1bb",
+  "branch": "main",
+  "outcome": "accepted",
+  "scope": "Local delegated bug-fix contract; deployment unverified",
+  "closed_findings": [
+    "F1",
+    "F2",
+    "F3",
+    "F4",
+    "R2-F2"
+  ],
+  "remaining_blocking_findings": [],
+  "files": {
+    "README.md": "614bc991bdb473cc0c265f02f1edfbe40419a8e928f36f8e24b5f1991f954087",
+    "app/main.py": "bdb82e3e0444fcc4794ca5ebb71d2aff25ac91795d7168314977dbb970682a80",
+    "app/network.py": "969402edfd34a02bf9c50a8c85eb73efab0180e1bd0c683c4a7bcd1377857f84",
+    "functions/api/info.js": "6683d9379a49fcf8e6217b32110557e0abea237f24dec0f4851338aef8c016f0",
+    "functions/ip.js": "88d10adf7e25bb04aef82da0812583dde3ea9a74115a7e5f6009da0357e80de9",
+    "functions/api/json.js": "286af648f1626a942d4c98b85af17dc44127a9a1e6a388a07143caf52009efaa",
+    "lib/ip.js": "4c0c9d04bcaf13df2441709b9aab124ee52ca02cde129b711844cdc45d293f2b",
+    "package.json": "1f0cc3deb597fc4dc7e52b60b09e037f9d7416867e5148803ffc09d00777c91d",
+    "public/app.js": "ec0b26a21ae890fb390741f9c9651daa48f21b4a4bd5c389c7d77e12b4a24ed6",
+    "public/index.html": "319465e6c5167c53dd74e9759d8e26e4ea07dc4294f18782614fd14831ec2366",
+    "public/robots.txt": "417180fcb3c1a67ccc42eefae2a5e3d03f3b3dfaa3a51e57a8c4bb50b739f7eb",
+    "public/sitemap.xml": "873128fee8e470a182479ff957aa9d4efccd4d064c5d02a727b2b90a261406db",
+    "run.py": "e8e394407739e0246760a98d6ff10f4378bbec8b8aa224277a85bf3f65baca3d",
+    "start.bat": "0f6e6b1f2790550ff5937d272e65c64a6e5790ce431aae57f7b9efae0531031e",
+    "tests/fixtures.json": "cf744b111d01c0acdba526038a1e516cb9f654a640b9f4823f5f644260e5f949",
+    "tests/test_check_ip.py": "668f79122f4c7f922f0b5ea51430538733c8ea997812c2579b77129a5bd09c86",
+    "tests/check_ip.test.js": "0b005f30afe97b496baea60d1bbc74528922009e6a09ca82042440349bf37c37",
+    "docs/handoffs/GEMINI_FIX_REPORT.md": "c9d96307e8d7ec3221ebd5dd2d00986503407945917860a50669c22a2ab83886",
+    "docs/handoffs/GEMINI_FIX_PLAN.md": "65d6d0abdae85413796802b11223172769e6e00181871ccb717a5eeed07fb7f1",
+    "docs/handoffs/GEMINI_FIX_BASELINE.json": "057639a646c1f21b32d5f484114ed2b714625015273a36cfa7c4c265e651906d"
+  }
+}

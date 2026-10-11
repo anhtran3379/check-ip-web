@@ -4,7 +4,8 @@
   "description": "SEO-optimized Client IP Checker on Cloudflare Pages",
   "scripts": {
     "dev": "npx wrangler pages dev public",
-    "deploy": "npx wrangler pages deploy public"
+    "deploy": "npx wrangler pages deploy public",
+    "test": "node --experimental-vm-modules --test"
   },
   "devDependencies": {
     "wrangler": "^3.100.0"
