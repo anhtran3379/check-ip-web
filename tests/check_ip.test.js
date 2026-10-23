@@ -116,6 +116,11 @@ function createDomStub(options = {}) {
       getAttribute(k) {
         return attrs.has(k) ? attrs.get(k) : null;
       },
+      get textContent() { return this.innerText; },
+      set textContent(value) { this.innerText = value; },
+      addEventListener(event, handler) {
+        this["on" + event] = handler;
+      },
       focus() {},
       select() {}
     };
@@ -165,7 +170,25 @@ function createDomStub(options = {}) {
   }
 
   const bodyChildren = [];
+  const localizedElements = [];
+  const html = fs.readFileSync(path.join(ROOT_DIR, "public", "index.html"), "utf8");
+  for (const match of html.matchAll(/<[^>]+\bdata-i18n(?:-[\w-]+)?="[^"]+"[^>]*>/g)) {
+    const attrs = [...match[0].matchAll(/\b(id|data-i18n(?:-[\w-]+)?)="([^"]*)"/g)];
+    const id = attrs.find(attr => attr[1] === "id")?.[2];
+    const element = (id && elements.get(id)) || createElement(id);
+    for (const [, name, value] of attrs) element.setAttribute(name, value);
+    if (id) elements.set(id, element);
+    localizedElements.push(element);
+  }
+  const schema = createElement("structured-data");
+  schema.textContent = /id="structured-data"[^>]*>([\s\S]*?)<\/script>/.exec(html)[1];
+  elements.set("structured-data", schema);
   const document = {
+    documentElement: { lang: "vi" },
+    querySelectorAll(selector) {
+      const marker = /^\[([\w-]+)\]$/.exec(selector)[1];
+      return localizedElements.filter(element => element.getAttribute(marker) !== null);
+    },
     body: {
       appendChild(child) {
         child.parentNode = document.body;
@@ -208,6 +231,10 @@ function createDomStub(options = {}) {
 
   const windowObj = {
     location: { origin: options.origin || "https://check-ip-web.pages.dev" },
+    localStorage: options.storage || {
+      getItem() { return null; },
+      setItem() {}
+    },
     screen: options.screen || { width: 1920, height: 1080 }
   };
 
@@ -240,6 +267,7 @@ function createDomStub(options = {}) {
   };
 
   const ctx = vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(path.join(ROOT_DIR, "public", "i18n.js"), "utf8"), ctx);
   const appCode = fs.readFileSync(path.join(ROOT_DIR, "public", "app.js"), "utf8");
   vm.runInContext(appCode, ctx);
 
@@ -1012,4 +1040,76 @@ test("public/app.js renders security states, timezone comparison, coordinates 0,
   envStartup.document._domLoadedHandler();
   await new Promise(r => setTimeout(r, 20));
   assert.equal(envStartup.elements.get("client-ip-hero").innerText, "9.9.9.9");
+});
+
+test("language selection persists, updates cached results and metadata, and works without storage", () => {
+  const saved = new Map();
+  const storage = {
+    getItem: key => saved.get(key) ?? null,
+    setItem: (key, value) => saved.set(key, value)
+  };
+  let calls = 0;
+  const env = createDomStub({ storage, fetch: () => { calls++; } });
+  vm.runInContext('initializeLanguage()', env.ctx);
+  assert.equal(env.document.documentElement.lang, "vi");
+  vm.runInContext(`renderUI({ip:"8.8.8.8",is_private:false,
+    details:{isp:"Example ISP",latitude:0,longitude:0},
+    security:{detection_status:"not_detected",is_hosting:true}})`, env.ctx);
+  env.elements.get("language-select").onchange({ target: { value: "en" } });
+  assert.equal(env.document.documentElement.lang, "en");
+  assert.equal(saved.get("checkip-language"), "en");
+  assert.equal(env.elements.get("client-ip-hero").innerText, "8.8.8.8");
+  assert.equal(env.elements.get("detail-isp").innerText, "Example ISP");
+  assert.equal(env.elements.get("detail-coords").innerText, "Coordinates: 0.000, 0.000");
+  assert.equal(env.elements.get("vpn-badge-text").innerText, "No VPN/Proxy signals detected (Hosting IP)");
+  assert.equal(calls, 0, "Switching language must not perform a lookup");
+  const meta = env.document.querySelectorAll("[data-i18n-content]")
+    .find(element => element.getAttribute("data-i18n-content") === "meta.language");
+  assert.equal(meta.getAttribute("content"), "English");
+  const schema = JSON.parse(env.elements.get("structured-data").textContent);
+  assert.equal(schema["@graph"][0].inLanguage, "en");
+  assert.equal(schema["@graph"][1].mainEntity[3].name, "How can I hide or change my IP address?");
+  const reopened = createDomStub({ storage });
+  vm.runInContext('initializeLanguage()', reopened.ctx);
+  assert.equal(reopened.document.documentElement.lang, "en");
+  vm.runInContext('setLanguage("vi")', env.ctx);
+  assert.equal(env.elements.get("detail-coords").innerText, "Tọa độ: 0.000, 0.000");
+  assert.equal(meta.getAttribute("content"), "Vietnamese");
+  assert.equal(vm.runInContext('setLanguage("unsupported")', env.ctx), false);
+  assert.equal(env.document.documentElement.lang, "vi");
+
+  const blocked = createDomStub({ storage: {
+    getItem() { throw new Error("blocked"); },
+    setItem() { throw new Error("blocked"); }
+  }});
+  vm.runInContext('initializeLanguage(); setLanguage("en"); renderErrorState()', blocked.ctx);
+  assert.equal(blocked.document.documentElement.lang, "en");
+  assert.equal(blocked.elements.get("client-ip-hero").innerText, "Unknown");
+  vm.runInContext('setLanguage("vi")', blocked.ctx);
+  assert.equal(blocked.elements.get("client-ip-hero").innerText, "Không xác định");
+});
+
+test("language changes during a lookup and clipboard operations use the current language", async () => {
+  let resolve;
+  let calls = 0;
+  const env = createDomStub({
+    fetch: () => { calls++; return new Promise(done => { resolve = done; }); },
+    clipboard: { writeText: async () => {} }
+  });
+  const pending = vm.runInContext('fetchData()', env.ctx);
+  vm.runInContext('setLanguage("en")', env.ctx);
+  resolve(new Response(JSON.stringify({ ip: "192.168.1.2", is_private: true,
+    details: {}, security: { detection_status: "not_applicable" } })));
+  await pending;
+  assert.equal(calls, 1);
+  assert.equal(env.elements.get("hero-ip-label").innerText, "Your local IP address");
+  assert.equal(env.elements.get("vpn-badge-text").innerText, "Local IP");
+  await vm.runInContext('copyHeroIP()', env.ctx);
+  assert.equal(env.elements.get("toast-message").innerText, "Copied: 192.168.1.2");
+  vm.runInContext('clearTimeout(toastTimer)', env.ctx);
+  env.sandbox.fetch = async () => { throw new Error("offline"); };
+  await vm.runInContext('fetchData()', env.ctx);
+  assert.equal(env.elements.get("hero-isp").innerText, "Unknown");
+  assert.match(env.elements.get("toast-message").innerText, /^Could not load IP information:/);
+  vm.runInContext('clearTimeout(toastTimer)', env.ctx);
 });

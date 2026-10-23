@@ -676,6 +676,11 @@ class TestLiveUvicornSmoke(unittest.TestCase):
                 self.assertEqual(r_js.status_code, 200)
                 self.assertIn("renderSecurityStatus", r_js.text)
 
+                self.assertIn("/i18n.js", r_home.text)
+                r_i18n = client.get("/i18n.js")
+                self.assertEqual(r_i18n.status_code, 200)
+                self.assertIn("initializeLanguage", r_i18n.text)
+
                 # Spoofed header must be ignored in direct Uvicorn mode
                 r_ip = client.get("/ip", headers={"CF-Connecting-IP": "8.8.8.8", "X-Forwarded-For": "1.1.1.1"})
                 self.assertEqual(r_ip.status_code, 200)

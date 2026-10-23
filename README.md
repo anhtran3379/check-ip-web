@@ -23,6 +23,7 @@ Dự án hỗ trợ hai chế độ vận hành dùng chung một giao diện ch
   - `suspected`: Dịch vụ tra cứu phản hồi `proxy=true` (`Có dấu hiệu VPN/Proxy`).
   - So sánh múi giờ trình duyệt và múi giờ theo IP chỉ được hiển thị như thông tin phụ, không tự thay đổi kết luận VPN.
 - 📋 **Tiện ích giao diện:**
+  - Chọn **Tiếng Việt / English** ở thanh trên cùng; mặc định tiếng Việt, ghi nhớ lựa chọn trong trình duyệt khi được phép lưu trữ. Chuyển ngôn ngữ cập nhật ngay cả dữ liệu đang hiển thị, không gọi lại API.
   - Sao chép nhanh địa chỉ IP và lệnh `cURL` (có kiểm tra quyền Clipboard API và fallback an toàn).
   - Nhận diện trình duyệt, hệ điều hành và độ phân giải màn hình phía trình duyệt.
 
@@ -34,6 +35,7 @@ Dự án hỗ trợ hai chế độ vận hành dùng chung một giao diện ch
 | :--- | :---: | :---: | :--- |
 | `GET /` | Có | Có | Giao diện web chuẩn từ `public/index.html` |
 | `GET /app.js` | Có | Có | Logic frontend từ `public/app.js` |
+| `GET /i18n.js` | Có | Có | Bản dịch và bộ chọn ngôn ngữ từ `public/i18n.js` |
 | `GET /robots.txt` | Có | Có | Tệp cấu hình робот tìm kiếm từ `public/robots.txt` |
 | `GET /sitemap.xml` | Có | Có | Sơ đồ trang web từ `public/sitemap.xml` |
 | `GET /ip` | Có | Có | Trả về địa chỉ IP của kết nối dạng `text/plain` (`Cache-Control: no-store`) |

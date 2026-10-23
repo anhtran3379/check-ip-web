@@ -38,6 +38,11 @@ async def serve_app_js():
     return FileResponse(os.path.join(STATIC_DIR, "app.js"))
 
 
+@app.get("/i18n.js")
+async def serve_i18n_js():
+    return FileResponse(os.path.join(STATIC_DIR, "i18n.js"))
+
+
 def extract_client_ip(request: Request) -> dict:
     """Extracts and validates client IP strictly from request.client (never from untrusted headers)."""
     raw_host = request.client.host if (request.client and request.client.host) else None

@@ -1,4 +1,6 @@
 let currentIP = "";
+let lastRenderedData = null;
+let lastRenderFailed = false;
 let activeRequestId = 0;
 let activeAbortController = null;
 let toastTimer = null;
@@ -120,7 +122,7 @@ function parseCoordinate(val, min, max) {
 function parseUserAgent(uaString) {
   const ua = typeof uaString === "string" ? uaString : "";
 
-  let browser = "Khác";
+  let browser = t("other");
   if (ua.includes("OPR/") || ua.includes("Opera/") || ua.includes("OPiOS/")) {
     browser = "Opera";
   } else if (ua.includes("Edg/") || ua.includes("EdgA/") || ua.includes("EdgiOS/")) {
@@ -133,7 +135,7 @@ function parseUserAgent(uaString) {
     browser = "Safari";
   }
 
-  let os = "Khác";
+  let os = t("other");
   if (ua.includes("iPhone") || ua.includes("iPad") || ua.includes("iPod") || ua.includes("like Mac")) {
     os = "iOS";
   } else if (ua.includes("Android")) {
@@ -146,7 +148,7 @@ function parseUserAgent(uaString) {
     os = "Linux";
   }
 
-  return { browser, os, label: `${browser} trên ${os}` };
+  return { browser, os, label: t("browserOS", { browser, os }) };
 }
 
 function detectBrowserAndScreen() {
@@ -160,9 +162,9 @@ function detectBrowserAndScreen() {
   if (screenEl) {
     const scr = typeof window !== "undefined" && window.screen ? window.screen : null;
     if (scr && typeof scr.width === "number" && typeof scr.height === "number") {
-      screenEl.innerText = `Màn hình: ${scr.width} × ${scr.height} px`;
+      screenEl.innerText = t("screen", { width: scr.width, height: scr.height });
     } else {
-      screenEl.innerText = "Màn hình: Không xác định";
+      screenEl.innerText = t("screenUnknown");
     }
   }
 }
@@ -217,14 +219,14 @@ async function fetchData() {
     if (requestId !== activeRequestId) return;
 
     if (!res.ok) {
-      throw new Error(`Lỗi phản hồi từ máy chủ (${res.status})`);
+      throw new Error(t("serverError", { status: res.status }));
     }
 
     const data = await res.json();
     if (requestId !== activeRequestId) return;
 
     if (!data || typeof data !== "object" || data.status === "unavailable") {
-      throw new Error("Thông tin IP hiện không khả dụng");
+      throw new Error(t("unavailable"));
     }
 
     renderUI(data);
@@ -237,11 +239,11 @@ async function fetchData() {
     }
 
     const msg = timedOut
-      ? "Quá thời gian chờ phản hồi từ máy chủ"
-      : (err && err.message ? err.message : "Lỗi kết nối mạng");
+      ? t("timeout")
+      : (err && err.message ? err.message : t("networkError"));
 
     renderErrorState();
-    showToast("Không thể tải thông tin IP: " + msg);
+    showToast(t("loadError", { message: msg }));
   } finally {
     clearTimeout(timeoutId);
     if (requestId === activeRequestId) {
@@ -254,52 +256,56 @@ async function fetchData() {
 }
 
 function renderErrorState() {
+  lastRenderedData = null;
+  lastRenderFailed = true;
   currentIP = "";
 
   const heroLabel = document.getElementById("hero-ip-label");
-  if (heroLabel) heroLabel.innerText = "Địa chỉ IP kết nối của bạn";
+  if (heroLabel) heroLabel.innerText = t("connectionIP");
 
   const heroIp = document.getElementById("client-ip-hero");
-  if (heroIp) heroIp.innerText = "Không xác định";
+  if (heroIp) heroIp.innerText = t("unknown");
 
   const typeBadge = document.getElementById("ip-type-badge");
-  if (typeBadge) typeBadge.innerText = "Không xác định";
+  if (typeBadge) typeBadge.innerText = t("unknown");
 
   const heroIsp = document.getElementById("hero-isp");
-  if (heroIsp) heroIsp.innerText = "Không xác định";
+  if (heroIsp) heroIsp.innerText = t("unknown");
 
   const heroFlag = document.getElementById("hero-flag");
   if (heroFlag) heroFlag.innerText = "🌐";
 
   const heroLocation = document.getElementById("hero-location");
-  if (heroLocation) heroLocation.innerText = "Không xác định";
+  if (heroLocation) heroLocation.innerText = t("unknown");
 
   const edgeBadge = document.getElementById("header-edge");
-  if (edgeBadge) edgeBadge.innerText = "Không xác định";
+  if (edgeBadge) edgeBadge.innerText = t("unknown");
 
   const detailIsp = document.getElementById("detail-isp");
-  if (detailIsp) detailIsp.innerText = "Không xác định";
+  if (detailIsp) detailIsp.innerText = t("unknown");
 
   const detailAsn = document.getElementById("detail-asn");
-  if (detailAsn) detailAsn.innerText = "Không xác định";
+  if (detailAsn) detailAsn.innerText = t("unknown");
 
   const detailCity = document.getElementById("detail-city");
-  if (detailCity) detailCity.innerText = "Không xác định";
+  if (detailCity) detailCity.innerText = t("unknown");
 
   const detailCountry = document.getElementById("detail-country");
-  if (detailCountry) detailCountry.innerText = "🌐 Không xác định";
+  if (detailCountry) detailCountry.innerText = t("unknownCountry");
 
   const detailTz = document.getElementById("detail-tz");
-  if (detailTz) detailTz.innerText = "Không xác định";
+  if (detailTz) detailTz.innerText = t("unknown");
 
   const detailCoords = document.getElementById("detail-coords");
-  if (detailCoords) detailCoords.innerText = "Tọa độ: Không xác định";
+  if (detailCoords) detailCoords.innerText = t("coordinatesUnknown");
 
   renderSecurityStatus({}, { detection_status: "unknown", source: "none", reason: "fetch_error", is_hosting: false });
   safeCreateIcons();
 }
 
 function renderUI(data) {
+  lastRenderedData = data;
+  lastRenderFailed = false;
   const rawIp = data && typeof data.ip === "string" ? data.ip.trim() : "";
   const validIp = isValidIP(rawIp) ? rawIp : "";
   currentIP = validIp;
@@ -312,26 +318,26 @@ function renderUI(data) {
   const heroLabel = document.getElementById("hero-ip-label");
   if (heroLabel) {
     if (!validIp) {
-      heroLabel.innerText = "Địa chỉ IP kết nối của bạn";
+      heroLabel.innerText = t("connectionIP");
     } else if (isPrivate) {
-      heroLabel.innerText = "Địa chỉ IP nội bộ (Local IP) của bạn";
+      heroLabel.innerText = t("localIPLabel");
     } else {
-      heroLabel.innerText = "Địa chỉ IP công cộng (Public IP) của bạn";
+      heroLabel.innerText = t("publicIPLabel");
     }
   }
 
   const heroIp = document.getElementById("client-ip-hero");
   if (heroIp) {
-    heroIp.innerText = validIp || "Không xác định";
+    heroIp.innerText = validIp || t("unknown");
   }
 
   const typeBadge = document.getElementById("ip-type-badge");
   if (typeBadge) {
     if (!validIp) {
-      typeBadge.innerText = "Không xác định";
+      typeBadge.innerText = t("unknown");
     } else {
       const family = validIp.includes(":") ? "IPv6" : "IPv4";
-      typeBadge.innerText = isPrivate ? `${family} (Nội bộ)` : family;
+      typeBadge.innerText = isPrivate ? t("privateFamily", { family }) : family;
     }
   }
 
@@ -344,7 +350,7 @@ function renderUI(data) {
 
   const heroIsp = document.getElementById("hero-isp");
   if (heroIsp) {
-    heroIsp.innerText = cleanIsp || (isPrivate ? "Mạng nội bộ" : "Không xác định");
+    heroIsp.innerText = cleanIsp || (isPrivate ? t("localNetwork") : t("unknown"));
   }
 
   const heroFlag = document.getElementById("hero-flag");
@@ -358,7 +364,7 @@ function renderUI(data) {
     if (locParts.length > 0) {
       heroLocation.innerText = locParts.join(", ");
     } else {
-      heroLocation.innerText = isPrivate ? "Mạng nội bộ" : "Không xác định";
+      heroLocation.innerText = isPrivate ? t("localNetwork") : t("unknown");
     }
   }
 
@@ -370,35 +376,35 @@ function renderUI(data) {
       : (typeof details.colo === "string" && details.colo.trim() ? details.colo.trim() : null);
 
     if (rawDc) {
-      const dcName = rawDc === "SGN" ? "TP.HCM (SGN)" : (rawDc === "HAN" ? "Hà Nội (HAN)" : rawDc);
+      const dcName = rawDc === "SGN" ? t("hcmEdge") : (rawDc === "HAN" ? t("hanoiEdge") : rawDc);
       edgeBadge.innerText = `Edge: ${dcName}`;
     } else if (data && typeof data.latency_ms === "number" && Number.isFinite(data.latency_ms) && data.latency_ms >= 0) {
       edgeBadge.innerText = `TCP DNS: ${data.latency_ms} ms`;
     } else {
-      edgeBadge.innerText = "Máy chủ trực tiếp";
+      edgeBadge.innerText = t("directServer");
     }
   }
 
   // Detail Cards
   const detailIsp = document.getElementById("detail-isp");
   if (detailIsp) {
-    detailIsp.innerText = cleanIsp || (isPrivate ? "Mạng nội bộ" : "Không xác định");
+    detailIsp.innerText = cleanIsp || (isPrivate ? t("localNetwork") : t("unknown"));
   }
 
   const detailAsn = document.getElementById("detail-asn");
   if (detailAsn) {
     if (cleanAsn) {
-      detailAsn.innerText = `Số hiệu mạng: ${cleanAsn}`;
+      detailAsn.innerText = t("asn", { asn: cleanAsn });
     } else if (cleanOrg) {
       detailAsn.innerText = cleanOrg;
     } else {
-      detailAsn.innerText = isPrivate ? "Không áp dụng" : "Không xác định";
+      detailAsn.innerText = isPrivate ? t("notApplicable") : t("unknown");
     }
   }
 
   const detailCity = document.getElementById("detail-city");
   if (detailCity) {
-    detailCity.innerText = cleanCity || (isPrivate ? "Nội bộ" : "Không xác định");
+    detailCity.innerText = cleanCity || (isPrivate ? t("local") : t("unknown"));
   }
 
   const detailCountry = document.getElementById("detail-country");
@@ -406,14 +412,14 @@ function renderUI(data) {
     if (cleanCountry) {
       detailCountry.innerText = `${cleanFlag} ${cleanCountry}`;
     } else {
-      detailCountry.innerText = isPrivate ? "🌐 Mạng nội bộ" : "🌐 Không xác định";
+      detailCountry.innerText = isPrivate ? t("localCountry") : t("unknownCountry");
     }
   }
 
   const detailTz = document.getElementById("detail-tz");
   const normalizedIpTz = normalizeTimezone(details.timezone);
   if (detailTz) {
-    detailTz.innerText = normalizedIpTz ? details.timezone.trim() : "Không xác định";
+    detailTz.innerText = normalizedIpTz ? details.timezone.trim() : t("unknown");
   }
 
   const detailCoords = document.getElementById("detail-coords");
@@ -421,9 +427,9 @@ function renderUI(data) {
     const lat = parseCoordinate(details.latitude, -90, 90);
     const lon = parseCoordinate(details.longitude, -180, 180);
     if (lat !== null && lon !== null) {
-      detailCoords.innerText = `Tọa độ: ${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+      detailCoords.innerText = t("coordinates", { lat: lat.toFixed(3), lon: lon.toFixed(3) });
     } else {
-      detailCoords.innerText = "Tọa độ: Không xác định";
+      detailCoords.innerText = t("coordinatesUnknown");
     }
   }
 
@@ -459,7 +465,7 @@ function renderSecurityStatus(details, security) {
   if (normClientTz && normIpTz && normClientTz !== normIpTz) {
     if (tzAlert) tzAlert.classList.remove("hidden");
     if (tzAlertText) {
-      tzAlertText.innerText = `Thông tin phụ: Múi giờ thiết bị (${rawClientTz}) khác với múi giờ theo IP (${rawIpTz}).`;
+      tzAlertText.innerText = t("timezoneMismatch", { device: rawClientTz, ip: rawIpTz });
     }
   } else if (tzAlert) {
     tzAlert.classList.add("hidden");
@@ -474,7 +480,7 @@ function renderSecurityStatus(details, security) {
     if (vpnBadge) {
       vpnBadge.className = "px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1.5";
     }
-    if (vpnText) vpnText.innerText = "Có dấu hiệu VPN/Proxy";
+    if (vpnText) vpnText.innerText = t("suspected");
     if (vpnIcon) {
       vpnIcon.setAttribute("data-lucide", "alert-triangle");
       vpnIcon.className = "w-3.5 h-3.5 text-amber-400";
@@ -483,14 +489,14 @@ function renderSecurityStatus(details, security) {
       secCard.className = "glass-box rounded-2xl p-5 border-l-4 border-l-amber-500 flex flex-col md:flex-row md:items-center justify-between gap-4";
     }
     if (secTag) {
-      secTag.innerText = "Có dấu hiệu VPN/Proxy";
+      secTag.innerText = t("suspected");
       secTag.className = "text-[11px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30";
     }
     if (secDesc) {
-      secDesc.innerText = "Dữ liệu tra cứu ghi nhận dấu hiệu kết nối qua VPN, Proxy hoặc nút mạng trung gian. Kết quả chỉ mang tính tham khảo kỹ thuật.";
+      secDesc.innerText = t("suspectedDescription");
     }
     if (secType) {
-      secType.innerText = isHosting ? "Có dấu hiệu VPN/Proxy (Kèm tín hiệu Hosting)" : "Có dấu hiệu VPN/Proxy";
+      secType.innerText = isHosting ? t("suspectedHosting") : t("suspected");
       secType.className = "text-amber-300 font-semibold";
     }
     if (secIconBg) {
@@ -507,7 +513,7 @@ function renderSecurityStatus(details, security) {
       if (vpnBadge) {
         vpnBadge.className = "px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1.5";
       }
-      if (vpnText) vpnText.innerText = "Chưa phát hiện dấu hiệu VPN/Proxy (IP Hosting)";
+      if (vpnText) vpnText.innerText = t("notDetectedHosting");
       if (vpnIcon) {
         vpnIcon.setAttribute("data-lucide", "server");
         vpnIcon.className = "w-3.5 h-3.5 text-cyan-400";
@@ -516,14 +522,14 @@ function renderSecurityStatus(details, security) {
         secCard.className = "glass-box rounded-2xl p-5 border-l-4 border-l-cyan-500 flex flex-col md:flex-row md:items-center justify-between gap-4";
       }
       if (secTag) {
-        secTag.innerText = "Tín hiệu IP Hosting";
+        secTag.innerText = t("hostingSignal");
         secTag.className = "text-[11px] font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30";
       }
       if (secDesc) {
-        secDesc.innerText = "Chưa phát hiện dấu hiệu VPN/Proxy từ cờ proxy, nhưng địa chỉ IP thuộc dải trung tâm dữ liệu/hosting. Dữ liệu tra cứu có giới hạn, không thể kết luận chắc chắn.";
+        secDesc.innerText = t("hostingDescription");
       }
       if (secType) {
-        secType.innerText = "Tín hiệu IP Hosting / Trung tâm dữ liệu";
+        secType.innerText = t("hostingType");
         secType.className = "text-cyan-300 font-semibold";
       }
       if (secIconBg) {
@@ -536,7 +542,7 @@ function renderSecurityStatus(details, security) {
       if (vpnBadge) {
         vpnBadge.className = "px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5";
       }
-      if (vpnText) vpnText.innerText = "Chưa phát hiện dấu hiệu VPN/Proxy";
+      if (vpnText) vpnText.innerText = t("notDetected");
       if (vpnIcon) {
         vpnIcon.setAttribute("data-lucide", "info");
         vpnIcon.className = "w-3.5 h-3.5 text-indigo-400";
@@ -545,14 +551,14 @@ function renderSecurityStatus(details, security) {
         secCard.className = "glass-box rounded-2xl p-5 border-l-4 border-l-indigo-500 flex flex-col md:flex-row md:items-center justify-between gap-4";
       }
       if (secTag) {
-        secTag.innerText = "Chưa phát hiện dấu hiệu VPN/Proxy";
+        secTag.innerText = t("notDetected");
         secTag.className = "text-[11px] font-bold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30";
       }
       if (secDesc) {
-        secDesc.innerText = "Chưa phát hiện dấu hiệu VPN/Proxy trong dữ liệu tra cứu hiện tại. Kết quả có giới hạn theo cơ sở dữ liệu nguồn và không khẳng định tuyệt đối.";
+        secDesc.innerText = t("notDetectedDescription");
       }
       if (secType) {
-        secType.innerText = "Chưa phát hiện dấu hiệu VPN/Proxy";
+        secType.innerText = t("notDetected");
         secType.className = "text-indigo-300 font-semibold";
       }
       if (secIconBg) {
@@ -569,7 +575,7 @@ function renderSecurityStatus(details, security) {
     if (vpnBadge) {
       vpnBadge.className = "px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1.5";
     }
-    if (vpnText) vpnText.innerText = "IP nội bộ";
+    if (vpnText) vpnText.innerText = t("localIP");
     if (vpnIcon) {
       vpnIcon.setAttribute("data-lucide", "network");
       vpnIcon.className = "w-3.5 h-3.5 text-slate-400";
@@ -578,14 +584,14 @@ function renderSecurityStatus(details, security) {
       secCard.className = "glass-box rounded-2xl p-5 border-l-4 border-l-slate-500 flex flex-col md:flex-row md:items-center justify-between gap-4";
     }
     if (secTag) {
-      secTag.innerText = "IP nội bộ";
+      secTag.innerText = t("localIP");
       secTag.className = "text-[11px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700";
     }
     if (secDesc) {
-      secDesc.innerText = "Địa chỉ thuộc phạm vi mạng nội bộ hoặc dải đặc biệt; không áp dụng đánh giá VPN/Proxy công cộng.";
+      secDesc.innerText = t("localDescription");
     }
     if (secType) {
-      secType.innerText = "IP nội bộ";
+      secType.innerText = t("localIP");
       secType.className = "text-slate-300 font-semibold";
     }
     if (secIconBg) {
@@ -601,7 +607,7 @@ function renderSecurityStatus(details, security) {
   if (vpnBadge) {
     vpnBadge.className = "px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1.5";
   }
-  if (vpnText) vpnText.innerText = "Chưa đủ dữ liệu để đánh giá";
+  if (vpnText) vpnText.innerText = t("insufficient");
   if (vpnIcon) {
     vpnIcon.setAttribute("data-lucide", "help-circle");
     vpnIcon.className = "w-3.5 h-3.5 text-slate-400";
@@ -610,18 +616,18 @@ function renderSecurityStatus(details, security) {
     secCard.className = "glass-box rounded-2xl p-5 border-l-4 border-l-slate-600 flex flex-col md:flex-row md:items-center justify-between gap-4";
   }
   if (secTag) {
-    secTag.innerText = "Chưa đủ dữ liệu để đánh giá";
+    secTag.innerText = t("insufficient");
     secTag.className = "text-[11px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700";
   }
   if (secDesc) {
     secDesc.innerText = isHosting
-      ? "Ghi nhận tín hiệu mạng lưu trữ (Hosting/ASN), nhưng chưa đủ dữ liệu tra cứu để đánh giá trạng thái VPN/Proxy."
-      : "Chưa đủ dữ liệu để đánh giá trạng thái VPN/Proxy do thông tin tra cứu không đầy đủ hoặc tạm thời gián đoạn.";
+      ? t("unknownHostingDescription")
+      : t("unknownDescription");
   }
   if (secType) {
     secType.innerText = isHosting
-      ? "Tín hiệu IP Hosting (Chưa đủ dữ liệu VPN/Proxy)"
-      : "Chưa đủ dữ liệu để đánh giá";
+      ? t("unknownHostingType")
+      : t("insufficient");
     secType.className = "text-slate-300 font-semibold";
   }
   if (secIconBg) {
@@ -665,7 +671,7 @@ function fallbackCopyToClipboard(text) {
 
 async function copyText(text) {
   if (typeof text !== "string" || !text.trim()) {
-    showToast("Không có dữ liệu hợp lệ để sao chép");
+    showToast(t("copyNoData"));
     return false;
   }
 
@@ -674,7 +680,7 @@ async function copyText(text) {
   if (typeof navigator !== "undefined" && navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
     try {
       await navigator.clipboard.writeText(value);
-      showToast(`Đã sao chép: ${value}`);
+      showToast(t("copied", { value }));
       return true;
     } catch {
       // Fall through to execCommand fallback
@@ -683,17 +689,17 @@ async function copyText(text) {
 
   const fallbackOk = fallbackCopyToClipboard(value);
   if (fallbackOk) {
-    showToast(`Đã sao chép: ${value}`);
+    showToast(t("copied", { value }));
     return true;
   }
 
-  showToast("Không thể sao chép tự động. Vui lòng sao chép thủ công.");
+  showToast(t("copyFailed"));
   return false;
 }
 
 function copyHeroIP() {
   if (!currentIP) {
-    showToast("Chưa có địa chỉ IP hợp lệ để sao chép");
+    showToast(t("copyNoIP"));
     return Promise.resolve(false);
   }
   return copyText(currentIP);
@@ -722,9 +728,22 @@ function showToast(message) {
 
 if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
   document.addEventListener("DOMContentLoaded", () => {
+    initializeLanguage();
     safeCreateIcons();
     detectBrowserAndScreen();
     fetchData();
     updateCurlUrls();
   });
+}
+
+// Redraw cached data in the selected language without issuing another lookup.
+function renderCurrentLanguage() {
+  detectBrowserAndScreen();
+  if (lastRenderFailed) renderErrorState();
+  else if (lastRenderedData) renderUI(lastRenderedData);
+  const toast = document.getElementById("toast");
+  if (toast && toast.classList) {
+    toast.classList.remove("translate-y-0", "opacity-100");
+    toast.classList.add("translate-y-20", "opacity-0");
+  }
 }
